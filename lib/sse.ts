@@ -3,8 +3,9 @@
  * All rights reserved.
  */
 
-var SSE = function (url, options) {
+const SSE = function (url, options) {
 	if (!(this instanceof SSE)) {
+		//@ts-ignore
 		return new SSE(url, options);
 	}
 
@@ -44,7 +45,7 @@ var SSE = function (url, options) {
 			return;
 		}
 
-		var filtered = [];
+		var filtered: any[] = [];
 		this.listeners[type].forEach(function (element) {
 			if (element !== listener) {
 				filtered.push(element);
@@ -83,14 +84,14 @@ var SSE = function (url, options) {
 	};
 
 	this._setReadyState = function (state) {
-		var event = new CustomEvent("readystatechange");
+		var event = new CustomEvent("readystatechange") as SSEEvent;
 		event.readyState = state;
 		this.readyState = state;
 		this.dispatchEvent(event);
 	};
 
 	this._onStreamFailure = function (e) {
-		var event = new CustomEvent("error");
+		var event = new CustomEvent("error") as SSEEvent;
 		event.data = e.currentTarget.response;
 		this.dispatchEvent(event);
 		this.close();
@@ -171,7 +172,7 @@ var SSE = function (url, options) {
 			}.bind(this)
 		);
 
-		var event = new CustomEvent(e.event);
+		var event = new CustomEvent(e.event) as SSEEvent;
 		event.data = e.data;
 		event.id = e.id;
 		return event;
@@ -219,7 +220,11 @@ var SSE = function (url, options) {
 };
 
 // Export our SSE module for npm.js
+//@ts-ignore
+
 if (typeof exports !== "undefined") {
+	//@ts-ignore
+
 	exports.SSE = SSE;
 }
 
