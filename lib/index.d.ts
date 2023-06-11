@@ -34,6 +34,7 @@ interface SSEEvent extends CustomEvent {
 	id?: string | null;
 	data?: string;
 	readyState?: number;
+	source?: SSE;
 }
 
 // The export of the SSE class

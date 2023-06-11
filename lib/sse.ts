@@ -3,6 +3,8 @@
  * All rights reserved.
  */
 
+// @ts-nocheck
+
 class SSE {
 	INITIALIZING = -1;
 	CONNECTING = 0;
