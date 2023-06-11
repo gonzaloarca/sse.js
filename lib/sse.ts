@@ -3,34 +3,34 @@
  * All rights reserved.
  */
 
-const SSE = function (url, options) {
-	if (!(this instanceof SSE)) {
-		//@ts-ignore
-		return new SSE(url, options);
+class SSE {
+	INITIALIZING = -1;
+	CONNECTING = 0;
+	OPEN = 1;
+	CLOSED = 2;
+	FIELD_SEPARATOR = ":";
+
+	url: string;
+	headers: Record<string, string>;
+	payload: string;
+	method: string;
+	withCredentials: boolean;
+	listeners: Record<string, Function[]>;
+	xhr: XMLHttpRequest | null = null;
+	readyState: number = this.INITIALIZING;
+	progress: number = 0;
+	chunk: string = "";
+
+	constructor(url: string, options: SSEOptions) {
+		this.url = url;
+		this.headers = options.headers || {};
+		this.payload = options.payload !== undefined ? options.payload : "";
+		this.method = options.method || (this.payload && "POST") || "GET";
+		this.withCredentials = !!options.withCredentials;
+		this.listeners = {};
 	}
 
-	this.INITIALIZING = -1;
-	this.CONNECTING = 0;
-	this.OPEN = 1;
-	this.CLOSED = 2;
-
-	this.url = url;
-
-	options = options || {};
-	this.headers = options.headers || {};
-	this.payload = options.payload !== undefined ? options.payload : "";
-	this.method = options.method || (this.payload && "POST") || "GET";
-	this.withCredentials = !!options.withCredentials;
-
-	this.FIELD_SEPARATOR = ":";
-	this.listeners = {};
-
-	this.xhr = null;
-	this.readyState = this.INITIALIZING;
-	this.progress = 0;
-	this.chunk = "";
-
-	this.addEventListener = function (type, listener) {
+	addEventListener(type, listener): void {
 		if (this.listeners[type] === undefined) {
 			this.listeners[type] = [];
 		}
@@ -38,9 +38,9 @@ const SSE = function (url, options) {
 		if (this.listeners[type].indexOf(listener) === -1) {
 			this.listeners[type].push(listener);
 		}
-	};
+	}
 
-	this.removeEventListener = function (type, listener) {
+	removeEventListener(type, listener): void {
 		if (this.listeners[type] === undefined) {
 			return;
 		}
@@ -56,9 +56,9 @@ const SSE = function (url, options) {
 		} else {
 			this.listeners[type] = filtered;
 		}
-	};
+	}
 
-	this.dispatchEvent = function (e) {
+	dispatchEvent(e): boolean {
 		if (!e) {
 			return true;
 		}
@@ -81,28 +81,28 @@ const SSE = function (url, options) {
 		}
 
 		return true;
-	};
+	}
 
-	this._setReadyState = function (state) {
+	_setReadyState(state): void {
 		var event = new CustomEvent("readystatechange") as SSEEvent;
 		event.readyState = state;
 		this.readyState = state;
 		this.dispatchEvent(event);
-	};
+	}
 
-	this._onStreamFailure = function (e) {
+	_onStreamFailure(e): void {
 		var event = new CustomEvent("error") as SSEEvent;
 		event.data = e.currentTarget.response;
 		this.dispatchEvent(event);
 		this.close();
-	};
+	}
 
-	this._onStreamAbort = function (e) {
+	_onStreamAbort(e): void {
 		this.dispatchEvent(new CustomEvent("abort"));
 		this.close();
-	};
+	}
 
-	this._onStreamProgress = function (e) {
+	_onStreamProgress(e) {
 		if (!this.xhr) {
 			return;
 		}
@@ -129,20 +129,20 @@ const SSE = function (url, options) {
 				}
 			}.bind(this)
 		);
-	};
+	}
 
-	this._onStreamLoaded = function (e) {
+	_onStreamLoaded(e) {
 		this._onStreamProgress(e);
 
 		// Parse the last chunk.
 		this.dispatchEvent(this._parseEventChunk(this.chunk));
 		this.chunk = "";
-	};
+	}
 
 	/**
 	 * Parse a received SSE event chunk into a constructed event object.
 	 */
-	this._parseEventChunk = function (chunk) {
+	_parseEventChunk(chunk) {
 		if (!chunk || chunk.length === 0) {
 			return null;
 		}
@@ -176,9 +176,9 @@ const SSE = function (url, options) {
 		event.data = e.data;
 		event.id = e.id;
 		return event;
-	};
+	}
 
-	this._checkStreamClosed = function () {
+	_checkStreamClosed() {
 		if (!this.xhr) {
 			return;
 		}
@@ -186,9 +186,9 @@ const SSE = function (url, options) {
 		if (this.xhr.readyState === XMLHttpRequest.DONE) {
 			this._setReadyState(this.CLOSED);
 		}
-	};
+	}
 
-	this.stream = function () {
+	stream() {
 		this._setReadyState(this.CONNECTING);
 
 		this.xhr = new XMLHttpRequest();
@@ -206,18 +206,18 @@ const SSE = function (url, options) {
 		}
 		this.xhr.withCredentials = this.withCredentials;
 		this.xhr.send(this.payload);
-	};
+	}
 
-	this.close = function () {
+	close() {
 		if (this.readyState === this.CLOSED) {
 			return;
 		}
 
-		this.xhr.abort();
+		this.xhr?.abort?.();
 		this.xhr = null;
 		this._setReadyState(this.CLOSED);
-	};
-};
+	}
+}
 
 // Export our SSE module for npm.js
 //@ts-ignore

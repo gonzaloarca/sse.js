@@ -1,4 +1,11 @@
-// The interface for the SSE instance
+interface SSEOptions {
+	headers?: Record<string, string>;
+	payload?: string;
+	method?: string;
+	withCredentials?: boolean;
+}
+
+// The interface for the SSE class
 interface SSE {
 	INITIALIZING: number;
 	CONNECTING: number;
@@ -6,7 +13,7 @@ interface SSE {
 	CLOSED: number;
 	FIELD_SEPARATOR: string;
 	url: string;
-	headers: Record<string, unknown>;
+	headers: Record<string, string>;
 	payload: string;
 	method: string;
 	withCredentials: boolean;
@@ -22,29 +29,19 @@ interface SSE {
 	close(): void;
 }
 
-// The interface for the options in the SSE constructor
-interface SSEOptions {
-	headers?: Record<string, unknown>;
-	payload?: string;
-	method?: string;
-	withCredentials?: boolean;
+// The type for the events dispatched by the SSE class
+interface SSEEvent extends CustomEvent {
+	id?: string | null;
+	data?: string;
+	readyState?: number;
 }
 
-// The type for the SSE constructor function
-export interface SSEConstructor {
-	new (url: string, options?: SSEOptions): SSE;
-	prototype: SSE;
-}
-
-declare global {
-	var SSE: SSEConstructor;
-	interface SSEEvent extends CustomEvent {
-		id?: string | null;
-		data?: string;
-		readyState?: number;
-	}
-}
-
+// The export of the SSE class
 declare module "sse" {
-	export = SSE;
+	export const SSE: SSE;
+}
+interface SSEEvent extends CustomEvent {
+	id?: string | null;
+	data?: string;
+	readyState?: number;
 }
