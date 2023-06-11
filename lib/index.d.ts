@@ -6,27 +6,16 @@ interface SSEOptions {
 }
 
 // The interface for the SSE class
-interface SSE {
-	INITIALIZING: number;
-	CONNECTING: number;
-	OPEN: number;
-	CLOSED: number;
+interface SSE extends EventSource {
 	FIELD_SEPARATOR: string;
-	url: string;
 	headers: Record<string, string>;
 	payload: string;
 	method: string;
-	withCredentials: boolean;
 	listeners: Record<string, Function[]>;
 	xhr: XMLHttpRequest | null;
-	readyState: number;
 	progress: number;
 	chunk: string;
-	addEventListener(type: string, listener: Function): void;
-	removeEventListener(type: string, listener: Function): void;
-	dispatchEvent(e: SSEEvent): boolean;
 	stream(): void;
-	close(): void;
 }
 
 // The type for the events dispatched by the SSE class
