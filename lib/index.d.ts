@@ -1,5 +1,5 @@
 // The interface for the SSE instance
-interface SSEInstance {
+interface SSE {
 	INITIALIZING: number;
 	CONNECTING: number;
 	OPEN: number;
@@ -31,17 +31,20 @@ interface SSEOptions {
 }
 
 // The type for the SSE constructor function
-type SSEConstructor = new (url: string, options?: SSEOptions) => SSEInstance;
+export interface SSEConstructor {
+	new (url: string, options?: SSEOptions): SSE;
+	prototype: SSE;
+}
 
-// The declaration for the module
-declare const SSE: SSEConstructor;
+declare global {
+	var SSE: SSEConstructor;
+	interface SSEEvent extends CustomEvent {
+		id?: string | null;
+		data?: string;
+		readyState?: number;
+	}
+}
 
 declare module "sse" {
 	export = SSE;
-}
-
-interface SSEEvent extends CustomEvent {
-	id?: string | null;
-	data?: string;
-	readyState?: number;
 }
