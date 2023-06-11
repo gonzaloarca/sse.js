@@ -27,7 +27,7 @@ interface SSEEvent extends CustomEvent {
 }
 
 // The export of the SSE class
-declare module "sse" {
+declare module "sse.js" {
 	export const SSE: SSE;
 }
 interface SSEEvent extends CustomEvent {
